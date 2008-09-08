@@ -19,7 +19,7 @@ class Price
       @tax = Money.new((cents.to_f / (1000 + @@tax_rate) * @@tax_rate), @currency)
     else
       @money = Money.new(cents, @currency)
-      @tax = Money.new((@money.cents.to_f / (1000 + @@tax_rate) * @@tax_rate), @currency)
+      @tax = Money.new((@money.cents.to_f / 1000 * @@tax_rate), @currency)
     end
   end
   

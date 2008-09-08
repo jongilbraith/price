@@ -12,15 +12,15 @@ Basic price handling
 
 Price.tax_rate = 175  # Set the tax rate to 17.5%
 >> p = Price.new(100, "GBP", false)
-=> #<Price:0x41497dc @money=#<Money:0x4149610 @currency="GBP", @cents=100>, @currency="GBP", @tax=#<Money:0x41492f0 @currency="GBP", @cents=15>>
+=> #<Price:0x3b19cf4 @money=#<Money:0x3b065c8 @currency="GBP", @cents=100>, @currency="GBP", @tax=#<Money:0x3b06514 @currency="GBP", @cents=18>>
 >> p.tax
-=> #<Money:0x41492f0 @currency="GBP", @cents=15>
+=> #<Money:0x3b06514 @currency="GBP", @cents=18>
 >> p.without_tax
-=> #<Money:0x4149610 @currency="GBP", @cents=100>
+=> #<Money:0x3b065c8 @currency="GBP", @cents=100>
 >> p.with_tax
-=> #<Money:0x41393dc @currency="GBP", @cents=115>
+=> #<Money:0x3af7550 @currency="GBP", @cents=118>
 >> q = Price.new(118, "GBP", true)
-=> #<Price:0x41154dc @money=#<Money:0x4115400 @currency="GBP", @cents=100>, @currency="GBP", @tax=#<Money:0x4114eb0 @currency="GBP", @cents=18>>
+=> #<Price:0x3adb300 @money=#<Money:0x3adb224 @currency="GBP", @cents=100>, @currency="GBP", @tax=#<Money:0x3adb120 @currency="GBP", @cents=18>>
 >> q.tax
 => #<Money:0x4114eb0 @currency="GBP", @cents=18>
 >> q.without_tax
@@ -30,20 +30,23 @@ Price.tax_rate = 175  # Set the tax rate to 17.5%
 
 Aritmetic:
 
->> (p * 2)
-=> #<Price:0x403f9a4 @money=#<Money:0x403f940 @currency="GBP", @cents=200>, @currency="GBP", @tax=#<Money:0x403f878 @currency="GBP", @cents=30>>
->> (p / 2)
-=> #<Price:0x4032ad8 @money=#<Money:0x4032a74 @currency="GBP", @cents=50>, @currency="GBP", @tax=#<Money:0x403295c @currency="GBP", @cents=7>>
->> (p + q)
-=> #<Price:0x40eaa5c @money=#<Money:0x40ea9f8 @currency="GBP", @cents=200>, @currency="GBP", @tax=#<Money:0x40ea930 @currency="GBP", @cents=30>>
+>> p * 2
+=> #<Price:0x3af40f8 @money=#<Money:0x3af4094 @currency="GBP", @cents=200>, @currency="GBP", @tax=#<Money:0x3af3fe0 @currency="GBP", @cents=35>>
+>> p / 2
+=> #<Price:0x3ae78a8 @money=#<Money:0x3ae7844 @currency="GBP", @cents=50>, @currency="GBP", @tax=#<Money:0x3ae7790 @currency="GBP", @cents=9>>
+>> p + q
+=> #<Price:0x3ad79f8 @money=#<Money:0x3ad7994 @currency="GBP", @cents=200>, @currency="GBP", @tax=#<Money:0x3ad78e0 @currency="GBP", @cents=35>>
+>> p - q
+=> #<Price:0x3af6754 @money=#<Money:0x3af66f0 @currency="GBP", @cents=0>, @currency="GBP", @tax=#<Money:0x3af663c @currency="GBP", @cents=0>>
 >> (p + q).money
-=> #<Money:0x40e0a84 @currency="GBP", @cents=200>
+=> #<Money:0x3acfe38 @currency="GBP", @cents=200>
 >> (p + q).tax
-=> #<Money:0x40d2998 @currency="GBP", @cents=30>
+=> #<Money:0x3acad70 @currency="GBP", @cents=35>
 >> (p + q).without_tax
-=> #<Money:0x40be074 @currency="GBP", @cents=200>
+=> #<Money:0x3ac5514 @currency="GBP", @cents=200>
 >> (p + q).with_tax
-=> #<Money:0x40c642c @currency="GBP", @cents=230>
+=> #<Money:0x3abe6b0 @currency="GBP", @cents=235>
+
 
 Comparison:
 
