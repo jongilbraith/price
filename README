@@ -1,13 +1,72 @@
 Price
 =====
 
-Introduction goes here.
+A simple wrapper around Tobias Lütke's Money gem for handling prices - i.e. money values along with taxes.
 
+You can find Money at http://dist.leetsoft.com/api/money
 
-Example
-=======
+Usage
+=====
 
-Example goes here.
+Basic price handling
 
+Price.tax_rate = 175  # Set the tax rate to 17.5%
+>> p = Price.new(100, "GBP", false)
+=> #<Price:0x41497dc @money=#<Money:0x4149610 @currency="GBP", @cents=100>, @currency="GBP", @tax=#<Money:0x41492f0 @currency="GBP", @cents=15>>
+>> p.tax
+=> #<Money:0x41492f0 @currency="GBP", @cents=15>
+>> p.without_tax
+=> #<Money:0x4149610 @currency="GBP", @cents=100>
+>> p.with_tax
+=> #<Money:0x41393dc @currency="GBP", @cents=115>
+>> q = Price.new(118, "GBP", true)
+=> #<Price:0x41154dc @money=#<Money:0x4115400 @currency="GBP", @cents=100>, @currency="GBP", @tax=#<Money:0x4114eb0 @currency="GBP", @cents=18>>
+>> q.tax
+=> #<Money:0x4114eb0 @currency="GBP", @cents=18>
+>> q.without_tax
+=> #<Money:0x4115400 @currency="GBP", @cents=100>
+>> q.with_tax
+=> #<Money:0x40fbd20 @currency="GBP", @cents=118>
 
-Copyright (c) 2008 [name of plugin creator], released under the MIT license
+Aritmetic:
+
+>> (p * 2)
+=> #<Price:0x403f9a4 @money=#<Money:0x403f940 @currency="GBP", @cents=200>, @currency="GBP", @tax=#<Money:0x403f878 @currency="GBP", @cents=30>>
+>> (p / 2)
+=> #<Price:0x4032ad8 @money=#<Money:0x4032a74 @currency="GBP", @cents=50>, @currency="GBP", @tax=#<Money:0x403295c @currency="GBP", @cents=7>>
+>> (p + q)
+=> #<Price:0x40eaa5c @money=#<Money:0x40ea9f8 @currency="GBP", @cents=200>, @currency="GBP", @tax=#<Money:0x40ea930 @currency="GBP", @cents=30>>
+>> (p + q).money
+=> #<Money:0x40e0a84 @currency="GBP", @cents=200>
+>> (p + q).tax
+=> #<Money:0x40d2998 @currency="GBP", @cents=30>
+>> (p + q).without_tax
+=> #<Money:0x40be074 @currency="GBP", @cents=200>
+>> (p + q).with_tax
+=> #<Money:0x40c642c @currency="GBP", @cents=230>
+
+Comparison:
+
+>> p == q
+=> true
+>> r = Price.new(200, "GBP", false)
+=> #<Price:0x40942b0 @money=#<Money:0x4094210 @currency="GBP", @cents=200>, @currency="GBP", @tax=#<Money:0x4094148 @currency="GBP", @cents=30>>
+>> p < r
+=> true
+>> r > p
+=> true
+>> r < p
+=> false
+
+Look into the composed_of ActiveRecord method to better integrate this into your models.
+
+Future
+======
+Not actually used this yet, so if I find any bugs I'll fix them, and when I get some time I'll add
+cattr_accessor to the plugin so it's not dependent on ActiveRecord and I can move it to a general purpose gem.
+
+If needs be I'll also probably move the tax rate into the Price class at some point and add some more handling functionality.
+
+I suppose I should knock together some tests too.
+
+Copyright (c) 2008 Jon Gilbraith, released under the MIT license
