@@ -26,24 +26,24 @@ class Price
   end
 
   def ==(other_price)
-    raise "Cannot perform comparison between prices of different currency" if self.currency == other_price.currency
+    raise "Cannot perform comparison between prices of different currency" unless self.currency == other_price.currency
     self.with_tax == other_price.with_tax
   end
   
   def <=>(other_price)
-    raise "Cannot perform comparison between prices of different currency" if self.currency == other_price.currency
+    raise "Cannot perform comparison between prices of different currency" unless self.currency == other_price.currency
     self.with_tax <=> other_price.with_tax
   end
   
   def +(other_price)
-    raise "Cannot perform arithmetic between prices of different currency" if self.currency == other_price.currency
+    raise "Cannot perform arithmetic between prices of different currency" unless self.currency == other_price.currency
     Price.new(self.money.cents + other_price.money.cents, @currency) do |price|
       price.tax_cents = self.tax.cents + other_price.tax.cents
     end
   end
 
   def -(other_price)
-    raise "Cannot perform arithmetic between prices of different currency" if self.currency == other_price.currency
+    raise "Cannot perform arithmetic between prices of different currency" unless self.currency == other_price.currency
     Price.new(self.money.cents - other_price.money.cents, @currency) do |price|
       price.tax_cents = self.tax.cents - other_price.tax.cents
     end
