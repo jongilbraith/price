@@ -43,4 +43,12 @@ class Price
   
   alias :taxable? :taxable
   
+  def method_missing(method, *args)
+    if self.money.send(:respond_to?, method)
+      self.money.send(method, *args)
+    else
+      super
+    end
+  end
+  
 end
