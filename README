@@ -11,66 +11,79 @@ http://github.com/collectiveidea/money/tree.
 Usage
 =====
 
->> Price.tax_rate = 175  # Set the tax rate to 17.5%
-=> 175
->> p = Price.new(100, "GBP", true, false)
-=> #<Price:0x3b19cf4 @money=#<Money:0x3b065c8 @currency="GBP", @cents=100>, @currency="GBP", @tax=#<Money:0x3b06514 @currency="GBP", @cents=18>>
->> p.tax
-=> #<Money:0x3b06514 @currency="GBP", @cents=18>
->> p.without_tax
-=> #<Money:0x3b065c8 @currency="GBP", @cents=100>
->> p.with_tax
-=> #<Money:0x3af7550 @currency="GBP", @cents=118>
->> q = Price.new(118, "GBP", true, true)
-=> #<Price:0x3adb300 @money=#<Money:0x3adb224 @currency="GBP", @cents=100>, @currency="GBP", @tax=#<Money:0x3adb120 @currency="GBP", @cents=18>>
->> q.tax
-=> #<Money:0x4114eb0 @currency="GBP", @cents=18>
->> q.without_tax
-=> #<Money:0x4115400 @currency="GBP", @cents=100>
->> q.with_tax
-=> #<Money:0x40fbd20 @currency="GBP", @cents=118>
-
-
-# First set the tax rate (defaults to 15, as for the UK)
+- Setting the tax rate (to 17.5%)
 >> Price.tax_rate = 175
 => 175
 
-# Example of a price for a taxable item, initialised with a value including tax
->> p = Price.new(100, "GBP", true, false)
-=> #<Price:0x7050134 @taxable=true, @currency="GBP", @money=#<Money:0x705010c @currency="GBP", @precision=2, @cents=100>>
->> p.tax
-=> #<Money:0x704bf94 @currency="GBP", @precision=2, @cents=18>
->> p.without_tax
-=> #<Money:0x705010c @currency="GBP", @precision=2, @cents=100>
->> p.with_tax
-=> #<Money:0x7044e88 @currency="GBP", @precision=2, @cents=118>
+- Creating a price with no tax:
+>> p = Price.new(1000, "GBP")
+=> #<Price:0x7069f1c @tax=#<Money:0x7067be0 @currency="GBP", @precision=2, @cents=0>, @currency="GBP", @money=#<Money:0x7067fc8 @currency="GBP", @precision=2, @cents=1000>>
+>> p.money.to_f
+=> 10.0
+>> p.tax.to_f
+=> 0.0
 
-# Example of a price for a taxable item, initialised with a value excluding tax
->> q = Price.new(118, "GBP", true, true)
-=> #<Price:0x7036e64 @taxable=true, @currency="GBP", @money=#<Money:0x7036dec @currency="GBP", @precision=2, @cents=100>>
->> q.tax
-=> #<Money:0x7032d8c @currency="GBP", @precision=2, @cents=18>
->> q.without_tax
-=> #<Money:0x7036dec @currency="GBP", @precision=2, @cents=100>
->> q.with_tax
-=> #<Money:0x702b028 @currency="GBP", @precision=2, @cents=118>
+- Creating a price and specifying the amount of tax:
+>> p = Price.new(1000, "GBP") do |price|
+?> price.tax_cents = 175
+>> end
+=> #<Price:0x7015a98 @tax=#<Money:0x7015764 @currency="GBP", @precision=2, @cents=175>, @currency="GBP", @money=#<Money:0x7015a5c @currency="GBP", @precision=2, @cents=1000>>
+>> p.money.to_f
+=> 10.0
+>> p.tax.to_f
+=> 1.75
 
-# Example of attempting to create a price for a non taxable item, with a value inclusive of tax
->> r = Price.new(118, "GBP", false, true)
-RuntimeError: If something isn't taxable, you shouldn't be passing a tax inclusive price to it!
-	from /Users/jon/Dev/completelynovel/work/vendor/plugins/price/lib/price.rb:18:in `initialize'
-	from (irb):10:in `new'
-	from (irb):10
+- Creating a price by specifying the total price including the tax
+> p = Price.new(1175, "GBP") do |price|
+?> price.take_tax_from_money
+>> end
+>> p.money.to_f
+=> 10.0
+>> p.tax.to_f
+=> 1.75
 
-# Example of a price for a non taxable item, correctly initialised with a value excluding tax
->> r = Price.new(100, "GBP", false, false)
-=> #<Price:0x700f058 @taxable=false, @currency="GBP", @money=#<Money:0x700f030 @currency="GBP", @precision=2, @cents=100>>
->> r.tax
-=> #<Money:0x7005008 @currency="GBP", @precision=2, @cents=0>
->> r.without_tax
-=> #<Money:0x700f030 @currency="GBP", @precision=2, @cents=100>
->> r.with_tax
-=> #<Money:0x6ffdc54 @currency="GBP", @precision=2, @cents=100>
+- Retrieving amounts with and without taxes
+>> p.with_tax.to_f
+=> 11.75
+>> p.without_tax.to_f
+=> 10.0
+
+
+- Basic arithmetic (addition and subtraction only if both prices are of the same currency)
+>> p.money.to_f
+=> 10.0
+>> p.tax.to_f
+=> 1.75
+>> q = p / 2
+=> #<Price:0x6fbe7ac @tax=#<Money:0x6fbe66c @currency="GBP", @precision=2, @cents=88>, @money=#<Money:0x6fbe748 @currency="GBP", @precision=2, @cents=500>, @currency="GBP">
+>> (p * 2).money.to_f
+=> 20.0
+>> (p * 2).tax.to_f
+=> 3.5
+>> (p / 2).money.to_f
+=> 5.0
+>> (p / 2).tax.to_f
+=> 0.88
+>> (p + q).money.to_f
+=> 15.0
+>> (p + q).tax.to_f
+=> 2.63
+>> (p - q).money.to_f
+=> 5.0
+>> (p - q).tax.to_f
+=> 0.87
+
+- Comparison (if both prices are of the same currency)
+>> p == q
+=> false
+>> p < q
+=> false
+>> p > q
+=> true
+>> p = q
+=> #<Price:0x6fbe7ac @tax=#<Money:0x6fbe66c @currency="GBP", @precision=2, @cents=88>, @money=#<Money:0x6fbe748 @currency="GBP", @precision=2, @cents=500>, @currency="GBP">
+>> p == q
+=> true
 
 Look into the composed_of ActiveRecord method to better integrate this into your models.
 
