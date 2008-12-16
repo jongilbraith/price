@@ -15,11 +15,11 @@ class Price
   end
   
   def take_tax_from_money
-    tmp    = @money.cents.to_f
-    @money = Money.new((tmp / (1000 + @@tax_rate) * 1000), currency)
-    @tax   = Money.new((tmp / (1000 + @@tax_rate) * @@tax_rate), currency)
+    tmp    = @money.cents.to_f / (1000 + @@tax_rate)
+    @money = Money.new(tmp * 1000, currency)
+    @tax   = Money.new(tmp * @@tax_rate, currency)
   end
-
+  
   def tax_rate
     @@tax_rate.to_f / 10
   end
