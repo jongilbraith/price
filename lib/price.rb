@@ -7,28 +7,25 @@ class Price
   
   attr_accessor :money
   
-  attr_accessor :currency
-  
   attr_accessor :taxable
   
   def initialize(cents, currency, taxable = true, tax_inclusive = false)
-    @currency = currency
     @taxable  = taxable
     
     raise "If something isn't taxable, you shouldn't be passing a tax inclusive price to it!" if taxable == false && tax_inclusive == true
 
     if tax_inclusive == true
-      @money = Money.new((cents.to_f / (1000 + @@tax_rate) * 1000), self.currency)
+      @money = Money.new((cents.to_f / (1000 + @@tax_rate) * 1000), currency)
     else
-      @money = Money.new(cents, self.currency)
+      @money = Money.new(cents, currency)
     end
   end
   
   def tax
     if self.taxable == true
-      Money.new((self.money.cents.to_f / 1000 * @@tax_rate), self.currency)
+      Money.new((self.money.cents.to_f / 1000 * @@tax_rate), self.money.currency)
     else
-      Money.new(0, self.currency)
+      Money.new(0, self.money.currency)
     end
   end
   
