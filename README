@@ -1,100 +1,95 @@
-Price
-=====
+= Price
 
 A simple wrapper around Tobias Lütke's Money gem for handling prices - i.e. money values along with taxes.
-
-- replace....
 
 You can find the original Money at http://dist.leetsoft.com/api/money, and a nicely enhanced fork by collectiveidea at
 http://github.com/collectiveidea/money/tree.
 
-Usage
-=====
+= Usage
 
-- Creating a price with no tax:
->> p = Price.new(1000, "GBP")
-=> #<Price:0x7069f1c @tax=#<Money:0x7067be0 @currency="GBP", @precision=2, @cents=0>, @currency="GBP", @money=#<Money:0x7067fc8 @currency="GBP", @precision=2, @cents=1000>>
->> p.money.to_f
-=> 10.0
->> p.tax.to_f
-=> 0.0
+Creating a price with no tax:
+  >> p = Price.new(1000, "GBP")
+  => #<Price:0x7069f1c @tax=#<Money:0x7067be0 @currency="GBP", @precision=2, @cents=0>, @currency="GBP", @money=#<Money:0x7067fc8 @currency="GBP", @precision=2, @cents=1000>>
+  >> p.money.to_f
+  => 10.0
+  >> p.tax.to_f
+  => 0.0
 
-- Creating a price and manually specifying the amount of tax:
->> p = Price.new(1000, "GBP") do |price|
-?> price.tax_cents = 175
->> end
-=> #<Price:0x7015a98 @tax=#<Money:0x7015764 @currency="GBP", @precision=2, @cents=175>, @currency="GBP", @money=#<Money:0x7015a5c @currency="GBP", @precision=2, @cents=1000>>
->> p.money.to_f
-=> 10.0
->> p.tax.to_f
-=> 1.75
+Creating a price and manually specifying the amount of tax:
+  >> p = Price.new(1000, "GBP") do |price|
+  ?> price.tax_cents = 175
+  >> end
+  => #<Price:0x7015a98 @tax=#<Money:0x7015764 @currency="GBP", @precision=2, @cents=175>, @currency="GBP", @money=#<Money:0x7015a5c @currency="GBP", @precision=2, @cents=1000>>
+  >> p.money.to_f
+  => 10.0
+  >> p.tax.to_f
+  => 1.75
 
-- Creating a price by specifying the total price including the tax:
->> p = Price.new(1175, "GBP") do |price|
-?> price.take_tax_from_money(17.5)
->> end
-=> #<Price:0x6ff5324 @tax=#<Money:0x6ff5194 @currency="GBP", @precision=2, @cents=175>, @currency="GBP", @money=#<Money:0x6ff51e4 @currency="GBP", @precision=2, @cents=1000>>
->> p.money.to_f
-=> 10.0
->> p.tax.to_f
-=> 1.75
+Creating a price by specifying the total price including the tax:
+  >> p = Price.new(1175, "GBP") do |price|
+  ?> price.take_tax_from_money(17.5)
+  >> end
+  => #<Price:0x6ff5324 @tax=#<Money:0x6ff5194 @currency="GBP", @precision=2, @cents=175>, @currency="GBP", @money=#<Money:0x6ff51e4 @currency="GBP", @precision=2, @cents=1000>>
+  >> p.money.to_f
+  => 10.0
+  >> p.tax.to_f
+  => 1.75
 
-- Creating a price by specifying the untaxed price and adding the calculated tax:
->> p = Price.new(1000, "GBP") do |price|
-?> price.apply_tax(17.5)
->> end
-=> #<Price:0x705fef4 @tax=#<Money:0x70306f4 @currency="GBP", @precision=2, @cents=175>, @currency="GBP", @money=#<Money:0x705bdf4 @currency="GBP", @precision=2, @cents=1000>>
->> p.money.to_f
-=> 10.0
->> p.tax.to_f
-=> 1.75
+Creating a price by specifying the untaxed price and adding the calculated tax:
+  >> p = Price.new(1000, "GBP") do |price|
+  ?> price.apply_tax(17.5)
+  >> end
+  => #<Price:0x705fef4 @tax=#<Money:0x70306f4 @currency="GBP", @precision=2, @cents=175>, @currency="GBP", @money=#<Money:0x705bdf4 @currency="GBP", @precision=2, @cents=1000>>
+  >> p.money.to_f
+  => 10.0
+  >> p.tax.to_f
+  => 1.75
 
-- Retrieving amounts with and without taxes
->> p.with_tax.to_f
-=> 11.75
->> p.without_tax.to_f
-=> 10.0
+Retrieving amounts with and without taxes
+  >> p.with_tax.to_f
+  => 11.75
+  >> p.without_tax.to_f
+  => 10.0
 
-- Basic arithmetic (addition and subtraction only if both prices are of the same currency)
->> p.money.to_f
-=> 10.0
->> p.tax.to_f
-=> 1.75
->> q = p / 2
-=> #<Price:0x6fbe7ac @tax=#<Money:0x6fbe66c @currency="GBP", @precision=2, @cents=88>, @money=#<Money:0x6fbe748 @currency="GBP", @precision=2, @cents=500>, @currency="GBP">
->> (p * 2).money.to_f
-=> 20.0
->> (p * 2).tax.to_f
-=> 3.5
->> (p / 2).money.to_f
-=> 5.0
->> (p / 2).tax.to_f
-=> 0.88
->> (p + q).money.to_f
-=> 15.0
->> (p + q).tax.to_f
-=> 2.63
->> (p - q).money.to_f
-=> 5.0
->> (p - q).tax.to_f
-=> 0.87
+Basic arithmetic (addition and subtraction only if both prices are of the same currency)
+  >> p.money.to_f
+  => 10.0
+  >> p.tax.to_f
+  => 1.75
+  >> q = p / 2
+  => #<Price:0x6fbe7ac @tax=#<Money:0x6fbe66c @currency="GBP", @precision=2, @cents=88>, @money=#<Money:0x6fbe748 @currency="GBP", @precision=2, @cents=500>, @currency="GBP">
+  >> (p * 2).money.to_f
+  => 20.0
+  >> (p * 2).tax.to_f
+  => 3.5
+  >> (p / 2).money.to_f
+  => 5.0
+  >> (p / 2).tax.to_f
+  => 0.88
+  >> (p + q).money.to_f
+  => 15.0
+  >> (p + q).tax.to_f
+  => 2.63
+  >> (p - q).money.to_f
+  => 5.0
+  >> (p - q).tax.to_f
+  => 0.87
 
-- Comparison (if both prices are of the same currency)
->> p == q
-=> false
->> p < q
-=> false
->> p > q
-=> true
->> p = q
-=> #<Price:0x6fbe7ac @tax=#<Money:0x6fbe66c @currency="GBP", @precision=2, @cents=88>, @money=#<Money:0x6fbe748 @currency="GBP", @precision=2, @cents=500>, @currency="GBP">
->> p == q
-=> true
+Comparison (if both prices are of the same currency)
+  >> p == q
+  => false
+  >> p < q
+  => false
+  >> p > q
+  => true
+  >> p = q
+  => #<Price:0x6fbe7ac @tax=#<Money:0x6fbe66c @currency="GBP", @precision=2, @cents=88>, @money=#<Money:0x6fbe748 @currency="GBP", @precision=2, @cents=500>, @currency="GBP">
+  >> p == q
+  => true
 
 Look into the composed_of ActiveRecord method to better integrate this into your models.
 
-Future
-======
+= Future
 I suppose I should knock together some tests.
 
 Copyright (c) 2008 Jon Gilbraith, released under the MIT license
