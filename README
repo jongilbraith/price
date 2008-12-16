@@ -3,13 +3,7 @@ Price
 
 A simple wrapper around Tobias Lütke's Money gem for handling prices - i.e. money values along with taxes.
 
-When creating a Price object, you pass along a cent value and currency as with Money, along with two boolean
-parameters to say whether the item is taxable and if the value you're passing in is inclusive of the tax.
-
-I did previously have arithmetic functionality but once I introduced the 'taxable' factor too many gotchas
-came into play. I think you're best off sticking with the fundamental Money objects and keeping track of taxes
-yourself for any extensive monetary calculations. This library is more of use in the area of presentation -
-price lists, cart contents, etc.
+- replace....
 
 You can find the original Money at http://dist.leetsoft.com/api/money, and a nicely enhanced fork by collectiveidea at
 http://github.com/collectiveidea/money/tree.
