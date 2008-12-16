@@ -2,9 +2,6 @@ class Price
   
   include Comparable
   
-  @@tax_rate = 175
-  cattr_accessor :tax_rate
-  
   attr_accessor :money
   attr_accessor :tax
   
@@ -19,10 +16,14 @@ class Price
     @tax = Money.new(cents, @currency)
   end
   
-  def take_tax_from_money
-    tmp    = @money.cents.to_f / (1000 + @@tax_rate)
-    @money = Money.new(tmp * 1000, @currency)
-    @tax   = Money.new(tmp * @@tax_rate, @currency)
+  def take_tax_from_money(percentage)
+    tmp    = @money.cents.to_f / (100.0 + percentage)
+    @money = Money.new(tmp * 100, @currency)
+    @tax   = Money.new(tmp * percentage, @currency)
+  end
+
+  def apply_tax(percentage)
+    @tax = Money.new(@money.cents.to_f / 100 * percentage, @currency)
   end
 
   def ==(other_price)
@@ -59,10 +60,6 @@ class Price
     Price.new(self.money.cents / fixnum, @currency) do |price|
       price.tax_cents = self.tax.cents.to_f / fixnum
     end
-  end
-  
-  def tax_rate
-    @@tax_rate.to_f / 10
   end
   
   def with_tax

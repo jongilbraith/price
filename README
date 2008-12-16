@@ -11,10 +11,6 @@ http://github.com/collectiveidea/money/tree.
 Usage
 =====
 
-- Setting the tax rate (to 17.5%)
->> Price.tax_rate = 175
-=> 175
-
 - Creating a price with no tax:
 >> p = Price.new(1000, "GBP")
 => #<Price:0x7069f1c @tax=#<Money:0x7067be0 @currency="GBP", @precision=2, @cents=0>, @currency="GBP", @money=#<Money:0x7067fc8 @currency="GBP", @precision=2, @cents=1000>>
@@ -23,7 +19,7 @@ Usage
 >> p.tax.to_f
 => 0.0
 
-- Creating a price and specifying the amount of tax:
+- Creating a price and manually specifying the amount of tax:
 >> p = Price.new(1000, "GBP") do |price|
 ?> price.tax_cents = 175
 >> end
@@ -33,10 +29,21 @@ Usage
 >> p.tax.to_f
 => 1.75
 
-- Creating a price by specifying the total price including the tax
-> p = Price.new(1175, "GBP") do |price|
-?> price.take_tax_from_money
+- Creating a price by specifying the total price including the tax:
+>> p = Price.new(1175, "GBP") do |price|
+?> price.take_tax_from_money(17.5)
 >> end
+=> #<Price:0x6ff5324 @tax=#<Money:0x6ff5194 @currency="GBP", @precision=2, @cents=175>, @currency="GBP", @money=#<Money:0x6ff51e4 @currency="GBP", @precision=2, @cents=1000>>
+>> p.money.to_f
+=> 10.0
+>> p.tax.to_f
+=> 1.75
+
+- Creating a price by specifying the untaxed price and adding the calculated tax:
+>> p = Price.new(1000, "GBP") do |price|
+?> price.apply_tax(17.5)
+>> end
+=> #<Price:0x705fef4 @tax=#<Money:0x70306f4 @currency="GBP", @precision=2, @cents=175>, @currency="GBP", @money=#<Money:0x705bdf4 @currency="GBP", @precision=2, @cents=1000>>
 >> p.money.to_f
 => 10.0
 >> p.tax.to_f
@@ -47,7 +54,6 @@ Usage
 => 11.75
 >> p.without_tax.to_f
 => 10.0
-
 
 - Basic arithmetic (addition and subtraction only if both prices are of the same currency)
 >> p.money.to_f
