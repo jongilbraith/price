@@ -7,40 +7,29 @@ class Price
   
   attr_accessor :money
   
-  attr_accessor :tax
-  
   attr_accessor :currency
   
-  def initialize(cents, currency, tax_inclusive = false)
+  attr_accessor :taxable
+  
+  def initialize(cents, currency, taxable = true, tax_inclusive = false)
     @currency = currency
+    @taxable  = taxable
     
+    raise "If something isn't taxable, you shouldn't be passing a tax inclusive price to it!" if taxable == false && tax_inclusive == true
+
     if tax_inclusive == true
-      @money = Money.new((cents.to_f / (1000 + @@tax_rate) * 1000), @currency)
-      @tax = Money.new((cents.to_f / (1000 + @@tax_rate) * @@tax_rate), @currency)
+      @money = Money.new((cents.to_f / (1000 + @@tax_rate) * 1000), self.currency)
     else
-      @money = Money.new(cents, @currency)
-      @tax = Money.new((@money.cents.to_f / 1000 * @@tax_rate), @currency)
+      @money = Money.new(cents, self.currency)
     end
   end
   
-  def <=>(other_price)
-    @money.cents <=> other_price.money.cents if @currency == other_price.currency
-  end
-  
-  def +(other_price)
-    Price.new(self.without_tax.cents + other_price.without_tax.cents, @currency, false) if @currency == other_price.currency
-  end
-  
-  def -(other_price)
-    Price.new(self.without_tax.cents - other_price.without_tax.cents, @currency, false) if @currency == other_price.currency
-  end
-  
-  def *(fixnum)
-    Price.new(@money.cents * fixnum, @currency, false)    
-  end
-
-  def /(fixnum)
-    Price.new(@money.cents / fixnum, @currency, false)    
+  def tax
+    if self.taxable == true
+      Money.new((self.money.cents.to_f / 1000 * @@tax_rate), self.currency)
+    else
+      Money.new(0, self.currency)
+    end
   end
   
   def tax_rate
@@ -48,11 +37,11 @@ class Price
   end
   
   def with_tax
-    @money + @tax
+    self.money + self.tax
   end
   
   def without_tax
-    @money
+    self.money
   end
   
 end

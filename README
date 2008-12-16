@@ -3,15 +3,23 @@ Price
 
 A simple wrapper around Tobias Lütke's Money gem for handling prices - i.e. money values along with taxes.
 
-You can find Money at http://dist.leetsoft.com/api/money
+When creating a Price object, you pass along a cent value and currency as with Money, along with two boolean
+parameters to say whether the item is taxable and if the value you're passing in is inclusive of the tax.
+
+I did previously have arithmetic functionality but once I introduced the 'taxable' factor too many gotchas
+came into play. I think you're best off sticking with the fundamental Money objects and keeping track of taxes
+yourself for any extensive monetary calculations. This library is more of use in the area of presentation -
+price lists, cart contents, etc.
+
+You can find the original Money at http://dist.leetsoft.com/api/money, and a nicely enhanced fork by collectiveidea at
+http://github.com/collectiveidea/money/tree.
 
 Usage
 =====
 
-Basic price handling
-
-Price.tax_rate = 175  # Set the tax rate to 17.5%
->> p = Price.new(100, "GBP", false)
+>> Price.tax_rate = 175  # Set the tax rate to 17.5%
+=> 175
+>> p = Price.new(100, "GBP", true, false)
 => #<Price:0x3b19cf4 @money=#<Money:0x3b065c8 @currency="GBP", @cents=100>, @currency="GBP", @tax=#<Money:0x3b06514 @currency="GBP", @cents=18>>
 >> p.tax
 => #<Money:0x3b06514 @currency="GBP", @cents=18>
@@ -19,7 +27,7 @@ Price.tax_rate = 175  # Set the tax rate to 17.5%
 => #<Money:0x3b065c8 @currency="GBP", @cents=100>
 >> p.with_tax
 => #<Money:0x3af7550 @currency="GBP", @cents=118>
->> q = Price.new(118, "GBP", true)
+>> q = Price.new(118, "GBP", true, true)
 => #<Price:0x3adb300 @money=#<Money:0x3adb224 @currency="GBP", @cents=100>, @currency="GBP", @tax=#<Money:0x3adb120 @currency="GBP", @cents=18>>
 >> q.tax
 => #<Money:0x4114eb0 @currency="GBP", @cents=18>
@@ -28,48 +36,52 @@ Price.tax_rate = 175  # Set the tax rate to 17.5%
 >> q.with_tax
 => #<Money:0x40fbd20 @currency="GBP", @cents=118>
 
-Aritmetic:
 
->> p * 2
-=> #<Price:0x3af40f8 @money=#<Money:0x3af4094 @currency="GBP", @cents=200>, @currency="GBP", @tax=#<Money:0x3af3fe0 @currency="GBP", @cents=35>>
->> p / 2
-=> #<Price:0x3ae78a8 @money=#<Money:0x3ae7844 @currency="GBP", @cents=50>, @currency="GBP", @tax=#<Money:0x3ae7790 @currency="GBP", @cents=9>>
->> p + q
-=> #<Price:0x3ad79f8 @money=#<Money:0x3ad7994 @currency="GBP", @cents=200>, @currency="GBP", @tax=#<Money:0x3ad78e0 @currency="GBP", @cents=35>>
->> p - q
-=> #<Price:0x3af6754 @money=#<Money:0x3af66f0 @currency="GBP", @cents=0>, @currency="GBP", @tax=#<Money:0x3af663c @currency="GBP", @cents=0>>
->> (p + q).money
-=> #<Money:0x3acfe38 @currency="GBP", @cents=200>
->> (p + q).tax
-=> #<Money:0x3acad70 @currency="GBP", @cents=35>
->> (p + q).without_tax
-=> #<Money:0x3ac5514 @currency="GBP", @cents=200>
->> (p + q).with_tax
-=> #<Money:0x3abe6b0 @currency="GBP", @cents=235>
+# First set the tax rate (defaults to 15, as for the UK)
+>> Price.tax_rate = 175
+=> 175
 
+# Example of a price for a taxable item, initialised with a value including tax
+>> p = Price.new(100, "GBP", true, false)
+=> #<Price:0x7050134 @taxable=true, @currency="GBP", @money=#<Money:0x705010c @currency="GBP", @precision=2, @cents=100>>
+>> p.tax
+=> #<Money:0x704bf94 @currency="GBP", @precision=2, @cents=18>
+>> p.without_tax
+=> #<Money:0x705010c @currency="GBP", @precision=2, @cents=100>
+>> p.with_tax
+=> #<Money:0x7044e88 @currency="GBP", @precision=2, @cents=118>
 
-Comparison:
+# Example of a price for a taxable item, initialised with a value excluding tax
+>> q = Price.new(118, "GBP", true, true)
+=> #<Price:0x7036e64 @taxable=true, @currency="GBP", @money=#<Money:0x7036dec @currency="GBP", @precision=2, @cents=100>>
+>> q.tax
+=> #<Money:0x7032d8c @currency="GBP", @precision=2, @cents=18>
+>> q.without_tax
+=> #<Money:0x7036dec @currency="GBP", @precision=2, @cents=100>
+>> q.with_tax
+=> #<Money:0x702b028 @currency="GBP", @precision=2, @cents=118>
 
->> p == q
-=> true
->> r = Price.new(200, "GBP", false)
-=> #<Price:0x40942b0 @money=#<Money:0x4094210 @currency="GBP", @cents=200>, @currency="GBP", @tax=#<Money:0x4094148 @currency="GBP", @cents=30>>
->> p < r
-=> true
->> r > p
-=> true
->> r < p
-=> false
+# Example of attempting to create a price for a non taxable item, with a value inclusive of tax
+>> r = Price.new(118, "GBP", false, true)
+RuntimeError: If something isn't taxable, you shouldn't be passing a tax inclusive price to it!
+	from /Users/jon/Dev/completelynovel/work/vendor/plugins/price/lib/price.rb:18:in `initialize'
+	from (irb):10:in `new'
+	from (irb):10
+
+# Example of a price for a non taxable item, correctly initialised with a value excluding tax
+>> r = Price.new(100, "GBP", false, false)
+=> #<Price:0x700f058 @taxable=false, @currency="GBP", @money=#<Money:0x700f030 @currency="GBP", @precision=2, @cents=100>>
+>> r.tax
+=> #<Money:0x7005008 @currency="GBP", @precision=2, @cents=0>
+>> r.without_tax
+=> #<Money:0x700f030 @currency="GBP", @precision=2, @cents=100>
+>> r.with_tax
+=> #<Money:0x6ffdc54 @currency="GBP", @precision=2, @cents=100>
 
 Look into the composed_of ActiveRecord method to better integrate this into your models.
 
 Future
 ======
-Not actually used this yet, so if I find any bugs I'll fix them, and when I get some time I'll add
-cattr_accessor to the plugin so it's not dependent on ActiveRecord and I can move it to a general purpose gem.
-
-If needs be I'll also probably move the tax rate into the Price class at some point and add some more handling functionality.
-
-I suppose I should knock together some tests too.
+I suppose I should knock together some tests.
 
 Copyright (c) 2008 Jon Gilbraith, released under the MIT license
