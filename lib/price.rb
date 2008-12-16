@@ -44,4 +44,6 @@ class Price
     self.money
   end
   
+  alias :taxable? :taxable
+  
 end
