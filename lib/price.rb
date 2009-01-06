@@ -70,6 +70,14 @@ class Price
     self.money
   end
   
+  def to_f
+    self.money.to_f
+  end
+  
+  def to_s
+    self.money.to_s
+  end
+  
   def method_missing(method, *args)
     if self.money.send(:respond_to?, method)
       self.money.send(method, *args)
